@@ -72,7 +72,7 @@ RUN apk add libcap && setcap 'cap_net_bind_service=+ep' /home/project/main
 ###################
 # Run non-root user
 
-USER hub
+USER project
 
 ######################################
 # By default the app runs on port 80
@@ -88,5 +88,5 @@ HEALTHCHECK CMD curl --fail http://localhost:8081 || exit 1
 # Leeeeettttt'ssss goooooo!!!
 # Run the shizzle from the right working directory.
 
-WORKDIR /home/hub
-CMD ["./main", "serve"]
+WORKDIR /home/project
+CMD ["/home/project/main", "serve"]
