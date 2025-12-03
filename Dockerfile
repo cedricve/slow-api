@@ -64,12 +64,7 @@ COPY --chown=0:0 --from=builder /dist /
 # Move directory to /var/lib
 
 RUN apk update && apk add ca-certificates curl libstdc++ libc6-compat --no-cache && rm -rf /var/cache/apk/*
-
-##################
-# Try running hub api
-
 RUN mv /project/* /home/project/
-RUN /home/project/main version
 
 ###########################
 # Grant the necessary root capabilities to the process trying to bind to the privileged port
