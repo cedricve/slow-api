@@ -46,7 +46,6 @@ RUN cd /go/src/github.com/${REPO_PATH} && \
 
 WORKDIR /dist
 RUN cp -r /project ./
-RUN /dist/project/main version
 
 FROM alpine:latest
 
