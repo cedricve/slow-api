@@ -5,7 +5,7 @@ ENV GOROOT=/usr/local/go
 ENV GOPATH=/go
 ENV PATH=$GOPATH/bin:$GOROOT/bin:/usr/local/lib:$PATH
 ENV GOSUMDB=off
-ENV REPO_PATH=uug-ai/hub-api
+ENV REPO_PATH=cedricve/slow-api
 
 ##############################################################################
 # Copy all the relevant source code in the Docker image, so we can build this.
@@ -53,7 +53,7 @@ FROM alpine:latest
 ############################
 # Protect by non-root user.
 
-RUN addgroup -S cedricve && adduser -S hub -G cedricve && addgroup hub video
+RUN addgroup -S cedricve && adduser -S project -G cedricve && addgroup project video
 
 #################################
 # Copy files from previous images
