@@ -62,6 +62,15 @@ func main() {
 	router.GET("/instance2/embedding", createInstanceHandler("instance2", 1000, 2000))
 	router.GET("/instance3/embedding", createInstanceHandler("instance3", 2000, 4000))
 
+	// Add 4th instance that returns a 429 error
+	router.GET("/instance4/embedding", func(c *gin.Context) {
+		c.JSON(429, gin.H{
+			"error": "Too Many Requests",
+		})
+	})
+	// Add a 5th instance that returns a response between 30s to 60s
+	router.GET("/instance5/embedding", createInstanceHandler("instance5", 30000, 60000))
+
 	// Start server
 	port := getEnv("PORT", "8081")
 	log.Printf("Starting server on port %s with timeout range %d-%d ms", port, minTimeout, maxTimeout)
