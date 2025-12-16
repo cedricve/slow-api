@@ -25,54 +25,42 @@ func main() {
 	}
 
 	// Get timeout values from environment variables
-	minTimeout := getEnvAsInt("MIN_TIMEOUT", 4000)
-	maxTimeout := getEnvAsInt("MAX_TIMEOUT", 4000)
+	minTimeout := getEnvAsInt("MIN_TIMEOUT", 1000)
+	maxTimeout := getEnvAsInt("MAX_TIMEOUT", 10000)
 
 	// Create Gin router
 	router := gin.Default()
 
-	// Health endpoint
-	router.GET("/health", func(c *gin.Context) {
-		// Get service name from query param
-		serviceName := c.Query("service")
-
-		// Get min/max timeout from query params, fallback to env vars
-		min := minTimeout
-		max := maxTimeout
-
-		if minParam := c.Query("min"); minParam != "" {
-			if val, err := strconv.Atoi(minParam); err == nil {
-				min = val
+	// Helper function to create instance endpoint handler
+	createInstanceHandler := func(serviceName string, min, max int) gin.HandlerFunc {
+		return func(c *gin.Context) {
+			// Calculate random delay between min and max timeout
+			var delay int
+			if max > min {
+				delay = min + rand.Intn(max-min+1)
+			} else {
+				delay = min
 			}
-		}
 
-		if maxParam := c.Query("max"); maxParam != "" {
-			if val, err := strconv.Atoi(maxParam); err == nil {
-				max = val
+			// Sleep for the specified delay
+			time.Sleep(time.Duration(delay) * time.Millisecond)
+
+			// Return health response
+			response := HealthResponse{
+				Status:      "ok",
+				Timestamp:   time.Now().Format(time.RFC3339),
+				Delay:       delay,
+				ServiceName: serviceName,
 			}
+
+			c.JSON(200, response)
 		}
+	}
 
-		// Calculate random delay between min and max timeout
-		var delay int
-		if max > min {
-			delay = min + rand.Intn(max-min+1)
-		} else {
-			delay = min
-		}
-
-		// Sleep for the specified delay
-		time.Sleep(time.Duration(delay) * time.Millisecond)
-
-		// Return health response
-		response := HealthResponse{
-			Status:      "ok",
-			Timestamp:   time.Now().Format(time.RFC3339),
-			Delay:       delay,
-			ServiceName: serviceName,
-		}
-
-		c.JSON(200, response)
-	})
+	// Instance endpoints with different timeout ranges
+	router.GET("/instance1", createInstanceHandler("instance1", 500, 1000))
+	router.GET("/instance2", createInstanceHandler("instance2", 1000, 2000))
+	router.GET("/instance3", createInstanceHandler("instance3", 2000, 4000))
 
 	// Start server
 	port := getEnv("PORT", "8081")
