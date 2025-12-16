@@ -12,9 +12,10 @@ import (
 )
 
 type HealthResponse struct {
-	Status    string `json:"status"`
-	Timestamp string `json:"timestamp"`
-	Delay     int    `json:"delay_ms"`
+	Status      string `json:"status"`
+	Timestamp   string `json:"timestamp"`
+	Delay       int    `json:"delay_ms"`
+	ServiceName string `json:"service_name,omitempty"`
 }
 
 func main() {
@@ -32,12 +33,31 @@ func main() {
 
 	// Health endpoint
 	router.GET("/health", func(c *gin.Context) {
+		// Get service name from query param
+		serviceName := c.Query("service")
+
+		// Get min/max timeout from query params, fallback to env vars
+		min := minTimeout
+		max := maxTimeout
+
+		if minParam := c.Query("min"); minParam != "" {
+			if val, err := strconv.Atoi(minParam); err == nil {
+				min = val
+			}
+		}
+
+		if maxParam := c.Query("max"); maxParam != "" {
+			if val, err := strconv.Atoi(maxParam); err == nil {
+				max = val
+			}
+		}
+
 		// Calculate random delay between min and max timeout
 		var delay int
-		if maxTimeout > minTimeout {
-			delay = minTimeout + rand.Intn(maxTimeout-minTimeout+1)
+		if max > min {
+			delay = min + rand.Intn(max-min+1)
 		} else {
-			delay = minTimeout
+			delay = min
 		}
 
 		// Sleep for the specified delay
@@ -45,9 +65,10 @@ func main() {
 
 		// Return health response
 		response := HealthResponse{
-			Status:    "ok",
-			Timestamp: time.Now().Format(time.RFC3339),
-			Delay:     delay,
+			Status:      "ok",
+			Timestamp:   time.Now().Format(time.RFC3339),
+			Delay:       delay,
+			ServiceName: serviceName,
 		}
 
 		c.JSON(200, response)
