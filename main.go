@@ -58,9 +58,9 @@ func main() {
 	}
 
 	// Instance endpoints with different timeout ranges
-	router.GET("/instance1", createInstanceHandler("instance1", 500, 1000))
-	router.GET("/instance2", createInstanceHandler("instance2", 1000, 2000))
-	router.GET("/instance3", createInstanceHandler("instance3", 2000, 4000))
+	router.GET("/instance1/embedding", createInstanceHandler("instance1", 500, 1000))
+	router.GET("/instance2/embedding", createInstanceHandler("instance2", 1000, 2000))
+	router.GET("/instance3/embedding", createInstanceHandler("instance3", 2000, 4000))
 
 	// Start server
 	port := getEnv("PORT", "8081")
